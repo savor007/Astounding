@@ -9,6 +9,8 @@ import PyQt5
 import redis
 import boto3, botocore
 import time
+from subprocess import Popen, PIPE
+
 
 
 def TablePrint(content):
@@ -45,6 +47,11 @@ print("Identifier: {}".format(int("19a", 16)))
 t1=time.clock_gettime(0)
 time.sleep(2)
 print(time.clock_gettime(0)-t1)
+
+p = Popen(["gnome-terminal"])
+a=p.communicate("pwd", stdout=PIPE)
+print(a)
+#print("test",file=p)
 
 
 
