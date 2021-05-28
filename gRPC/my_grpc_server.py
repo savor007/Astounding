@@ -2,14 +2,14 @@ import datastream_pb2, datastream_pb2_grpc, grpc, time
 from concurrent import futures
 import random
 from queue import Queue
+import time
 
-task_queue=Queue()
+
 
 class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
-    def __init__(self, massage_queue=None):
+    def __init__(self):
         self.__token__=list()
         self.subscriber_mapping=dict()
-        self.message_queue=massage_queue
 
 
 
@@ -51,6 +51,7 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
         for topic, messages in topic_data.items():
             for message in messages:
                 print("gRPC server send a message. topic:{}, message:{}.".format(topic, message))
+                time.sleep(0.18)
                 yield datastream_pb2.TopicData(topicName=topic, messageData=message.encode())
                 #topic_data= datastream_pb2.TopicData()
                 # if self.message_queue.empty() == False:
@@ -85,8 +86,8 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
         pass
 
 
-def gRPC_Server_func(queue):
-    xavier_rpc_server=gRPC_Server(queue)
+def gRPC_Server_func():
+    xavier_rpc_server=gRPC_Server()
     server= grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     datastream_pb2_grpc.add_DataStreamServiceServicer_to_server(xavier_rpc_server, server)
 
@@ -101,6 +102,6 @@ def gRPC_Server_func(queue):
 
 
 if __name__ == "__main__":
-    gRPC_Server_func(task_queue)
+    gRPC_Server_func()
     pass
     pass
