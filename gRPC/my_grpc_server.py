@@ -70,7 +70,10 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
             """
             if self._terminate[token] == True:
                 break
-            time.sleep(2)
+            if aws_connection['available']:
+                time.sleep(0.5)
+            else:
+                time.sleep(2)
             yield datastream_pb2.TopicData(topicName="Stream Service", messageData="have to keep the service by yielding message".encode())
             #####method1 send a command by pushlish grpc message, sent by subscriber##############
             topic_data=self.subscriber_mapping[token]
@@ -81,6 +84,7 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
                     time.sleep(0.5)
                 ##############after send all of message, clear up the message list in that topic    
                 self.subscriber_mapping[token][topic]=list()
+            #####method2 check Messages in Redis[remote control pef resume/pause]######
             if aws_connection['available']:
                 result = sqs.Dequeue_Element(delete=True, message_to_read=1)
                 if result is None:
@@ -90,7 +94,7 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
                     aws_message_body=result[0]['message']
                     yield datastream_pb2.TopicData(topicName=aws_message_topic, messageData=aws_message_body.encode())
 
-            #####method2 check Messages in Redis[remote control pef resume/pause]######
+
             #####method3 Check Messages in AWS SQS[remote control pef resume/pause]#######
 
 
