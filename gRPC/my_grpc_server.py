@@ -4,6 +4,11 @@ import random
 from queue import Queue
 import time
 
+import sys
+sys.path.append("/home/nio/Documents/projects/Astounding/")    
+
+from OTA_Remote.remote_connection import remote_control_server, AWS_Queue
+from Configuration.Configuration import aws_connection, gRPC_Setting
 
 
 class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
@@ -52,7 +57,13 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
         print("received request from StartReadingTopicMessage")
         token=request.subscriberToken
         topic_data=self.subscriber_mapping[token]
-        print(topic_data)
+        try:
+            if aws_connection['available']:
+                sqs = AWS_Queue(local_ip_address= gRPC_Setting['local_service_ip'], remote_ip="aws sqs", queue_name=aws_connection["queue_name"])
+                sqs.Get_Queue_url()
+        except Exception as error:
+            print(error)
+ 
         while True:
             """
             will break when receiving a remove subscriber request
@@ -60,7 +71,7 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
             if self._terminate[token] == True:
                 break
             time.sleep(2)
-            yield datastream_pb2.TopicData(topicName="heart_beating", messageData="This is a stream service, so I have to keep the service yield message.".encode())
+            yield datastream_pb2.TopicData(topicName="Stream Service", messageData="have to keep the service by yielding message".encode())
             #####method1 send a command by pushlish grpc message, sent by subscriber##############
             topic_data=self.subscriber_mapping[token]
             for topic, messages in topic_data.items():
@@ -70,6 +81,14 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
                     time.sleep(0.5)
                 ##############after send all of message, clear up the message list in that topic    
                 self.subscriber_mapping[token][topic]=list()
+            if aws_connection['available']:
+                result = sqs.Dequeue_Element(delete=True, message_to_read=1)
+                if result is None:
+                    continue
+                else:
+                    aws_message_topic=result[0]['attributes']['service_token']['StringValue']
+                    aws_message_body=result[0]['message']
+                    yield datastream_pb2.TopicData(topicName=aws_message_topic, messageData=aws_message_body.encode())
 
             #####method2 check Messages in Redis[remote control pef resume/pause]######
             #####method3 Check Messages in AWS SQS[remote control pef resume/pause]#######
@@ -124,7 +143,7 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
             except Exception as error:
                 print(error)
         
-        print(self.subscriber_mapping)
+        #print(self.subscriber_mapping)
         return datastream_pb2.google_dot_protobuf_dot_empty__pb2.Empty()
         pass
 
