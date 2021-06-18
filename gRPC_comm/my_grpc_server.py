@@ -71,7 +71,7 @@ class gRPC_Server(datastream_pb2_grpc.DataStreamServiceServicer):
             if self._terminate[token] == True:
                 break
             if aws_connection['available']:
-                time.sleep(0.5)
+                time.sleep(0.2)
             else:
                 time.sleep(2)
             yield datastream_pb2.TopicData(topicName="Stream Service", messageData="have to keep the service by yielding message".encode())

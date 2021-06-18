@@ -28,6 +28,10 @@ class UDP_Receiver:
         self._udp_socket.settimeout(timeout)
         self._received_packages_num=0
         self.gui=GUI
+        #self._udp_socket.setsockopt(socket.SOL_SOCKET,socket.SO_SNDBUF)
+        #print("socket.SO_SNDBUF:"+str(socket.SO_SNDBUF))
+        #print("socket.SO_RCVBUF"+str(socket.SO_RCVBUF))
+
 
 
     @property
@@ -77,8 +81,8 @@ if __name__ == "__main__":
     
 
     radar_udp_rec=UDP_Receiver("Radar Receiver", "169.254.115.15", 9002, 65000, timeout=180, GUI=None)
-    velodyne_udp_rec=UDP_Receiver("Velodyne Lidar Receiver","169.254.115.15",9001,timeout=180, GUI=None)
-    p1=multiprocessing.Process(target=radar_udp_rec.ReceiveDigram, args=(None,))
-    p2=multiprocessing.Process(target=velodyne_udp_rec.ReceiveDigram, args=(None,))
-    p1.start()
-    p2.start()
+   
+    # p1=multiprocessing.Process(target=radar_udp_rec.ReceiveDigram, args=(None,))
+    # p1.start()
+    radar_udp_rec.ReceiveDigram()
+ 

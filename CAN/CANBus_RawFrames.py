@@ -107,7 +107,7 @@ if __name__ == "__main__":
     #can_receiver('can0', 500000, 100)
     can_receiver=CANBusRawFrame_Reader('can0', 500000)
     can_receiver.message_to_read=-1
-    can_receiver.can_comm_timeout=25
+    can_receiver.can_comm_timeout=100
     can_receiver.Start_CANChannel_RawFrames_Receive()
     #print(can_receiver.duration)
     print("logging duration time:{} seconds, total received frames:{}.".format(can_receiver.duration, can_receiver.receive_frames))

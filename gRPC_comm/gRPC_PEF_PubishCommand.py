@@ -15,12 +15,12 @@ def invoke_publish_msg(subcriber, msg_topic,msg_body):
 
 
 def SendMessage(message_topic="python_test_command",message_body=""):
-    with grpc.insecure_channel('169.254.115.15:9889') as channel:
+    with grpc.insecure_channel('169.254.115.37:9889') as channel:
         Message_Dispatcher=datastream_pb2_grpc.DataStreamServiceStub(channel)
         invoke_publish_msg(Message_Dispatcher, message_topic, message_body)
 
 
 if __name__ == "__main__":
-    SendMessage("PEFCommand","Resume")
+    SendMessage("PEFCommand","Pause123")
     pass
 
