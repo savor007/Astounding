@@ -156,7 +156,7 @@ class AWS_Queue(remote_control_server):
 if __name__ == '__main__':
     sqs = AWS_Queue(local_ip_address= gRPC_Setting['local_service_ip'], remote_ip="aws sqs", queue_name=aws_connection["queue_name"])
     sqs.Get_Queue_url()
-    sqs.Enqueue_Element(service_token="PEFCommand", message='Pause')
+    sqs.Enqueue_Element(service_token="PEFCommand", message='Resume')
     result=None
 #    result = sqs.Dequeue_Element(delete=True, message_to_read=1)
     if result is not None:

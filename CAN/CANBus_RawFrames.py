@@ -1,5 +1,6 @@
 import can
 import time
+import os
 from datetime import datetime
 from pprint import pprint
 
@@ -15,6 +16,10 @@ class CANBusRawFrame_Reader(object):
         self._start_time=0
         self._end_time=0
         self._receive_number = 0
+
+    @property
+    def receive_starttime(self):
+        return self._start_time
 
 
     @property
@@ -78,6 +83,8 @@ class CANBusRawFrame_Reader(object):
                     break
                 elif i == 0:
                     self._start_time=time.clock_gettime(0)
+                elif i != 0:
+                    self._can_comm_timeout=35
 
             except Exception as error:
                 print(error)
@@ -107,7 +114,12 @@ if __name__ == "__main__":
     #can_receiver('can0', 500000, 100)
     can_receiver=CANBusRawFrame_Reader('can0', 500000)
     can_receiver.message_to_read=-1
-    can_receiver.can_comm_timeout=100
+    can_receiver.can_comm_timeout=130
     can_receiver.Start_CANChannel_RawFrames_Receive()
     #print(can_receiver.duration)
-    print("logging duration time:{} seconds, total received frames:{}.".format(can_receiver.duration, can_receiver.receive_frames))
+    can_receive_result="CAN Playback:first packet receive time:{}, logging duration time:{} seconds, total received frames:{}.".format(datetime.fromtimestamp(can_receiver.receive_starttime), can_receiver.duration, can_receiver.receive_frames)
+    print(can_receive_result)
+    can_filename="can_receive_log_{}.txt".format(datetime.now().strftime('%Y_%m_%d_%H%M%S'))
+    can_filepath="/mnt/a055017a-3fac-4681-894f-bde3f20cf0c5/CAN_Receive_Logs"
+    with open(os.path.join(can_filepath, can_filename),"wb+") as can_logging_file:
+        can_logging_file.write(can_receive_result.encode('utf-8'))

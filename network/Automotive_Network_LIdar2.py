@@ -7,7 +7,7 @@ from queue import Queue
 #from ../TkWIndow.tkwindow import MY_GUI
 #import sys
 sys.path.append("/home/nio/Documents/projects/Astounding/")    
-import TkWIndow.tkwindow
+import os
 
 
 
@@ -28,6 +28,9 @@ class UDP_Receiver:
         self._udp_socket.settimeout(timeout)
         self._received_packages_num=0
         self.gui=GUI
+        sched=os.SCHED_RR
+        priority_max= os.sched_get_priority_max(sched)
+        parameter= os.sched_param(priority_max)
         #self._udp_socket.setsockopt(socket.SOL_SOCKET,socket.SO_SNDBUF)
         #print("socket.SO_SNDBUF:"+str(socket.SO_SNDBUF))
         #print("socket.SO_RCVBUF"+str(socket.SO_RCVBUF))

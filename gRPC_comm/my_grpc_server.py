@@ -157,7 +157,7 @@ def gRPC_Server_func():
     server= grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     datastream_pb2_grpc.add_DataStreamServiceServicer_to_server(xavier_rpc_server, server)
 
-    server.add_insecure_port('169.254.115.15:9889')
+    server.add_insecure_port('169.254.115.15:50051')
     server.start()
     print("gRPC Server Running")
 

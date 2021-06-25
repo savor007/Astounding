@@ -1,5 +1,5 @@
 import grpc, datastream_pb2, datastream_pb2_grpc
-
+from retry import retry
 
 
 def invoke_publish_msg(subcriber, msg_topic,msg_body):
@@ -9,18 +9,20 @@ def invoke_publish_msg(subcriber, msg_topic,msg_body):
     try:
         subcriber.PublishMessage(message)
         print("send message successfully")
+        return None
     except Exception as error:
         print(error)
+        raise error
 
 
-
+@retry(tries=5, delay=1)
 def SendMessage(message_topic="python_test_command",message_body=""):
-    with grpc.insecure_channel('169.254.115.37:9889') as channel:
+    with grpc.insecure_channel('169.254.115.37:50051', options=(('grpc.enable_http_proxy',0),)) as channel:
         Message_Dispatcher=datastream_pb2_grpc.DataStreamServiceStub(channel)
         invoke_publish_msg(Message_Dispatcher, message_topic, message_body)
 
 
 if __name__ == "__main__":
-    SendMessage("PEFCommand","Pause123")
+    SendMessage("PEFCommand","Resume")
     pass
 
